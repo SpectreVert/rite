@@ -32,6 +32,7 @@ diag(char const* fmt, ...)
 {
 	va_list ap;
 
+	printf("# ");
 	va_start(ap, fmt);
 	vprintf(fmt, ap);
 	va_end(ap);
