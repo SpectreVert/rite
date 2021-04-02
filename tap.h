@@ -111,7 +111,7 @@ plan_skip_all(char const* fmt, ...)
 {
 	va_list ap;
 
-	printf("1..0 # skip ");
+	printf("1..0 # SKIP ");
 	va_start(ap, fmt);
 	vprintf(fmt, ap);
 	va_end(ap);
@@ -126,27 +126,30 @@ ok(_Bool expression, char const* fmt, ...)
 {
 	va_list ap;
 
+	if (tap_stat.skip) expression = 1;
 	printf("%s %d - ", expression ? "ok":"not ok", ++tap_stat.done);
 	va_start(ap, fmt);
 	vprintf(fmt, ap);
 	va_end(ap);
 	
+
+	if (tap_stat.skip)
+	{
+		assert(!tap_stat.todo);
+		printf(" # SKIP %s\n", tap_stat.msg);
+		return expression;
+	}
 	if (tap_stat.todo)
 	{
 		assert(!tap_stat.skip);
-		printf(" # todo %s\n", tap_stat.msg);
-	}
-	else if (tap_stat.skip)
-	{
-		assert(!tap_stat.todo);
-		printf(" # skip %s\n", tap_stat.msg);
+		printf(" # TODO %s\n", tap_stat.msg);
 	}
 	else
 	{
+		expression ? (void) ap : ++tap_stat.failed;
 		putchar('\n');
 	}
 
-	expression ? (void) ap : ++tap_stat.failed;
 	return expression;
 }
 
@@ -209,7 +212,7 @@ skip(unsigned int nb, char const* fmt, ...)
 
 	for (; i != nb; ++i)
 	{
-		printf("ok %d - # skip ", ++tap_stat.done);
+		printf("ok %d - # SKIP ", ++tap_stat.done);
 		va_start(ap, fmt);
 		vprintf(fmt, ap);
 		va_end(ap);
