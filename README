@@ -1,0 +1,16 @@
+tap
+---
+test anything protocol for c
+
+tap.h contains functions for writing tests that respect the
+Test Anything Protocol (https://testanything.org/). The API
+is mainly inspired from the library written by Nik Clayton,
+but differs in that is much smaller and simpler.
+
+Requirements
+------------
+- a c89 compatible compiler
+
+Usage
+-----
+TODO
