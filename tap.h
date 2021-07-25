@@ -15,6 +15,29 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define tap_write_ok(expr) \
+	if (tap_stat.skip) expr = 1; \
+	printf("%s %d", expr ? "ok":"not ok", ++tap_stat.done);
+
+#define tap_write_msg(fmt) \
+	printf(" - "); \
+	va_list ap; \
+	va_start(ap, fmt); \
+	vprintf(fmt, ap); \
+	va_end(ap);
+
+#define tap_test_ok(expr) \
+	if (tap_stat.skip) {     \
+		assert(!tap_stat.todo); \
+		printf(" # SKIP %s\n", tap_stat.msg); \
+		return expr; \
+	} else if (tap_stat.todo) { \
+		assert(!tap_stat.skip); \
+		printf(" # TODO %s\n", tap_stat.msg); \
+	} else { \
+		expr ? (void) expr : ++tap_stat.failed; \
+		putchar('\n'); }
+
 typedef struct {
 	_Bool got_plan;
 	_Bool todo;
@@ -117,47 +140,26 @@ plan_skip_all(char const* fmt, ...)
 	va_end(ap);
 	putchar('\n');	
 	
-	/* Get rid of potential warnings */
+	/* get rid of potential warnings */
 	exit(0); return 0;
 }
 
 static unsigned int
 ok(_Bool expression, char const* fmt, ...)
 {
-	va_list ap;
-
-	if (tap_stat.skip) expression = 1;
-	printf("%s %d - ", expression ? "ok":"not ok", ++tap_stat.done);
-	va_start(ap, fmt);
-	vprintf(fmt, ap);
-	va_end(ap);
-	
-
-	if (tap_stat.skip)
-	{
-		assert(!tap_stat.todo);
-		printf(" # SKIP %s\n", tap_stat.msg);
-		return expression;
-	}
-	if (tap_stat.todo)
-	{
-		assert(!tap_stat.skip);
-		printf(" # TODO %s\n", tap_stat.msg);
-	}
-	else
-	{
-		expression ? (void) ap : ++tap_stat.failed;
-		putchar('\n');
-	}
+	tap_write_ok(expression);
+	tap_write_msg(fmt);
+	tap_test_ok(expression);
 
 	return expression;
 }
 
 static unsigned int
-ok1(int expression)
+ok1(_Bool expression)
 {
-	printf("%s %d\n", expression ? "ok":"not ok", ++tap_stat.done);
-	
+	tap_write_ok(expression);
+	tap_test_ok(expression);
+
 	expression ? (void) expression : ++tap_stat.failed;
 	return expression;
 }
@@ -165,29 +167,24 @@ ok1(int expression)
 static unsigned int
 pass(char const* fmt, ...)
 {
-	va_list ap;
+	_Bool expression = 1;
 
-	printf("ok %d - ", ++tap_stat.done);
-	va_start(ap, fmt);
-	vprintf(fmt, ap);
-	va_end(ap);
-	putchar('\n');
+	tap_write_ok(expression);
+	tap_write_msg(fmt);
+	tap_test_ok(expression);
 	
-	return 0;
+	return 1;
 }
 
 static unsigned int
 fail(char const* fmt, ...)
 {
-	va_list ap;
+	_Bool expression = 0;
 
-	printf("not ok %d - ", ++tap_stat.done);
-	va_start(ap, fmt);
-	vprintf(fmt, ap);
-	va_end(ap);
-	putchar('\n');
+	tap_write_ok(expression);
+	tap_write_msg(fmt);
+	tap_test_ok(expression);
 
-	++tap_stat.failed;
 	return 0;
 }
 
@@ -221,8 +218,6 @@ skip(unsigned int nb, char const* fmt, ...)
 
 	return 0;
 }
-
-/* TODO: check if plan called before ok etc */
 
 static void
 todo_start(char const* msg)
