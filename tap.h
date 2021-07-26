@@ -15,6 +15,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#if __cplusplus
+#  define _Bool bool
+#endif
+
 #define tap_write_ok(expr) \
 	if (tap_stat.skip) expr = 1; \
 	printf("%s %d", expr ? "ok":"not ok", ++tap_stat.done);
@@ -35,7 +39,7 @@
 		assert(!tap_stat.skip); \
 		printf(" # TODO %s\n", tap_stat.msg); \
 	} else { \
-		expr ? (void) expr : ++tap_stat.failed; \
+		if (!expr) ++tap_stat.failed; \
 		putchar('\n'); }
 
 typedef struct {
@@ -160,7 +164,7 @@ ok1(_Bool expression)
 	tap_write_ok(expression);
 	tap_test_ok(expression);
 
-	expression ? (void) expression : ++tap_stat.failed;
+	if (!expression) ++tap_stat.failed;
 	return expression;
 }
 

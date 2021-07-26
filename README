@@ -7,9 +7,11 @@ Test Anything Protocol (https://testanything.org/). The API
 is mainly inspired from the library written by Nik Clayton,
 but differs in that is much smaller and simpler.
 
+tap.h is also compatible with C++
+
 Requirements
 ------------
-- a c89 compatible compiler
+- a c99 compliant compiler
 
 Install
 -------
