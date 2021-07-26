@@ -11,6 +11,16 @@ Requirements
 ------------
 - a c89 compatible compiler
 
+Install
+-------
+tap.h is a single header library. Place it wherever you
+want: in your project directory, in your include path...
+
+use the `install' program to copy it to a convenient
+location, i.e `/usr/local/include':
+
+> install -m 644 tap.h /usr/local/include
+
 Usage
 -----
 TODO
