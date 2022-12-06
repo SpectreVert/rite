@@ -1,46 +1,42 @@
 rite
 ----
-simple header for testing c source code
+simple header for testing c/c++ source code
+
+Todo
+----
+
+ <> document functions
+ <> add a demo.c file with examples
 
 Abstract
 --------
-rite.h contains functions for writing test programs that produce output
-following the Test Anything Protocol. While the tests can be run standalone,
-a harness that knows the protocol can run them and produce reports indicating their success or failure.
+rite.h contains functions for writing tests programs that produce output
+following the Test Anything Protocol. A test harness that knows this protocol
+can run them and produce reports indicating their success or failure.
 
-This header and its interface were inspired by libtap from Nik Clayton. It
-differs from the latter in that it is smaller and simpler. In fact I have
-stripped most of the convenience features that are present in libtap. Notably:
- <> test names are not checked for validity (only digits, `#` in name...)
- <> the functions are not safe to call in a multi-threaded environment.
- <> c strings memory managment is 100% left to the user of the header. I.e:
-    skip() and todo() do not support printf-style arguments for the message.
-    Any manipulation of the message is required to be done before calling the
-    functions. The pointer to the message needs to be valid until the last test.
-
-The goal of rite.h is to provide a very simple, almost bare-bones TAP producer
-implementation. Any additional code would make it too complex in my eyes. That
-said, it would be trivial to fork+modify the code in order to implement any of
-aforementioned non-features.
+This header was inspired by Nik Clayton's libtap. Appart from the interface,
+we have pretty much nothing in common with the latter. Our goal is to provide
+a very simple, barebones implementation of a TAP producer. We have almost
+no user input checking or error handling. Not using the code as you should
+can result in undefined behavior.
 
 Usage
 -----
-This section is under construction. Since the API is very similar to that
-of the original libtap for c/c++ you can refer to their man page.
+rite.h is a «stb-style» single-header library. This means that by default
+it only exposes the functions delarations just like a normal header.
 
-Experienced c programmers will have no trouble determining how things work
-with a quick skim of the source code.
+To create the implementation you *must* do this:
+
+ #define ZEE_RITE_IMPLEMENTATION
+ #include "rite.h"
+
+in exactly *one* C or C++ file.
+
+You can #define ZEE_ASSERT(x) before the #include to avoid using assert.h
 
 Requirements
 ------------
  <> a c99 compliant compiler
-
-Install
--------
-Use the `install` program to copy rite.h to a convenient location, i.e your
-local include path:
-
-> install -m 644 rite.h /usr/local/include
 
 License
 -------
